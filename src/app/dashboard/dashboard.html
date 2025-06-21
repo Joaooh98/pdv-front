@@ -2,99 +2,159 @@
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-left">
-      <h1 class="logo">🪒 PDV Barbearia</h1>
-      <div class="datetime">
+      <div class="logo-section">
+        <div class="logo-icon"></div>
+        <h1 class="logo-text">PDV Barbearia</h1>
+      </div>
+      <div class="date-time">
         <span class="date">{{ currentDate }}</span>
         <span class="time">{{ currentTime }}</span>
       </div>
     </div>
     
     <div class="header-right">
-      <div class="user-info" *ngIf="user">
-        <span class="greeting">{{ getGreeting() }}, {{ user.name }}!</span>
-        <span class="user-role" *ngIf="user.isAdmin">👑 Administrador</span>
+      <div class="user-section" *ngIf="user">
+        <div class="user-info">
+          <span class="greeting">{{ getGreeting() }}, {{ user.name }}</span>
+          <span class="user-badge" *ngIf="user.isAdmin">Administrador</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <span>Sair</span>
+        </button>
       </div>
-      <button class="logout-btn" (click)="logout()">
-        🚪 Sair
-      </button>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="dashboard-content">
     
-    <!-- Cards de Resumo -->
-    <section class="summary-cards">
-      <div 
-        class="summary-card" 
-        *ngFor="let card of dashboardCards"
-        [class]="'card-' + card.color"
-      >
-        <div class="card-header">
-          <span class="card-icon">{{ card.icon }}</span>
-          <span class="card-title">{{ card.title }}</span>
+    <!-- Analytics Cards -->
+    <section class="analytics-section">
+      <div class="analytics-grid">
+        <div class="analytics-card sales">
+          <div class="card-header">
+            <h3>Vendas Hoje</h3>
+            <div class="trend-badge positive">+12%</div>
+          </div>
+          <div class="card-value">€1.250,00</div>
+          <div class="card-subtitle">23 atendimentos realizados</div>
         </div>
-        
-        <div class="card-content">
-          <div class="card-value">{{ card.value }}</div>
-          <div class="card-subtitle">{{ card.subtitle }}</div>
+
+        <div class="analytics-card appointments">
+          <div class="card-header">
+            <h3>Próximos Agendamentos</h3>
+          </div>
+          <div class="card-value">8</div>
+          <div class="card-subtitle">Para hoje</div>
         </div>
-        
-        <div class="card-footer" *ngIf="card.percentage">
-          <span class="trend-indicator" [class]="'trend-' + card.trend">
-            {{ getTrendIcon(card.trend) }} {{ card.percentage }}
-          </span>
+
+        <div class="analytics-card inventory">
+          <div class="card-header">
+            <h3>Produtos em Estoque</h3>
+            <div class="trend-badge negative">-3%</div>
+          </div>
+          <div class="card-value">87</div>
+          <div class="card-subtitle">5 com estoque baixo</div>
+        </div>
+
+        <div class="analytics-card customers">
+          <div class="card-header">
+            <h3>Clientes Ativos</h3>
+            <div class="trend-badge positive">+8%</div>
+          </div>
+          <div class="card-value">156</div>
+          <div class="card-subtitle">Este mês</div>
         </div>
       </div>
     </section>
 
-    <!-- Ações Rápidas -->
-    <section class="quick-actions">
-      <h2 class="section-title">Ações Rápidas</h2>
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <div class="section-header">
+        <h2>Ações Rápidas</h2>
+      </div>
       
       <div class="actions-grid">
-        <button 
-          class="action-card"
-          *ngFor="let action of quickActions"
-          [class]="'action-' + action.color"
-          (click)="action.action && action.action()"
-        >
-          <div class="action-icon">{{ action.icon }}</div>
+        <button class="action-card primary" (click)="startNewSale()">
           <div class="action-content">
-            <h3 class="action-title">{{ action.title }}</h3>
-            <p class="action-description">{{ action.description }}</p>
+            <h3>Nova Venda</h3>
+            <p>Registrar atendimento e vendas</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </button>
+        
+        <button class="action-card secondary" (click)="viewSchedule()">
+          <div class="action-content">
+            <h3>Agendamentos</h3>
+            <p>Gerenciar agenda e horários</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </button>
+        
+        <button class="action-card secondary" (click)="manageProducts()">
+          <div class="action-content">
+            <h3>Produtos</h3>
+            <p>Controle de estoque e catálogo</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </button>
+        
+        <button class="action-card secondary" (click)="viewReports()">
+          <div class="action-content">
+            <h3>Relatórios</h3>
+            <p>Análises e métricas de performance</p>
           </div>
           <div class="action-arrow">→</div>
         </button>
       </div>
     </section>
 
-    <!-- Status da Barbearia -->
+    <!-- Status Overview -->
     <section class="status-section">
-      <h2 class="section-title">Status da Barbearia</h2>
+      <div class="section-header">
+        <h2>Status Operacional</h2>
+      </div>
       
       <div class="status-grid">
         <div class="status-card">
-          <h3>🕒 Horário de Funcionamento</h3>
-          <p><strong>Seg-Sex:</strong> 08:00 - 18:00</p>
-          <p><strong>Sábado:</strong> 08:00 - 16:00</p>
-          <p><strong>Domingo:</strong> Fechado</p>
-        </div>
-        
-        <div class="status-card">
-          <h3>💺 Cadeiras Disponíveis</h3>
-          <div class="chairs-status">
-            <div class="chair available">Cadeira 1 ✅</div>
-            <div class="chair occupied">Cadeira 2 🔴</div>
-            <div class="chair available">Cadeira 3 ✅</div>
+          <div class="status-header">
+            <h3>Funcionamento</h3>
+            <div class="status-indicator active"></div>
+          </div>
+          <div class="status-content">
+            <div class="schedule-item">
+              <span class="day">Seg - Sex</span>
+              <span class="hours">08:00 - 18:00</span>
+            </div>
+            <div class="schedule-item">
+              <span class="day">Sábado</span>
+              <span class="hours">08:00 - 16:00</span>
+            </div>
+            <div class="schedule-item">
+              <span class="day">Domingo</span>
+              <span class="hours">Fechado</span>
+            </div>
           </div>
         </div>
         
         <div class="status-card">
-          <h3>📞 Atendimento</h3>
-          <p><strong>WhatsApp:</strong> (11) 99999-9999</p>
-          <p><strong>Telefone:</strong> (11) 3333-3333</p>
-          <p><strong>Status:</strong> <span class="status-online">🟢 Online</span></p>
+          <div class="status-header">
+            <h3>Estações de Trabalho</h3>
+          </div>
+          <div class="status-content">
+            <div class="workstation-item available">
+              <span class="station-name">Estação 1</span>
+              <span class="station-status">Disponível</span>
+            </div>
+            <div class="workstation-item occupied">
+              <span class="station-name">Estação 2</span>
+              <span class="station-status">Em atendimento</span>
+            </div>
+            <div class="workstation-item available">
+              <span class="station-name">Estação 3</span>
+              <span class="station-status">Disponível</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
