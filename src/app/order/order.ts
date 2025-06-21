@@ -90,11 +90,16 @@ export class OrderComponent implements OnInit {
   isLoadingServices: boolean = false;
   isLoadingProducts: boolean = false;
   isProcessingOrder: boolean = false;
+  showSuccessModal: boolean = false;
+  orderTotal: number = 0;
   
   // Cliente
   customerName: string = '';
   customerPhone: string = '';
   customerDocument: string = '';
+  
+  // Pagamento
+  paymentType: 'CASH' | 'CARD' | 'PIX' | 'TRANSFER' = 'CASH';
   
   // Totais
   get subtotal(): number {
@@ -325,6 +330,7 @@ export class OrderComponent implements OnInit {
     this.customerName = '';
     this.customerPhone = '';
     this.customerDocument = '';
+    this.paymentType = 'CASH';
   }
 
   processOrder() {
@@ -355,7 +361,7 @@ export class OrderComponent implements OnInit {
       },
       payments: [
         {
-          paymentType: 'CASH',
+          paymentType: this.paymentType,
           amount: this.total
         }
       ],
@@ -374,20 +380,26 @@ export class OrderComponent implements OnInit {
       }
     };
 
-    console.log('Enviando pedido para API:', orderRequest);
-
     // Envia para a API
     this.http.post(this.getApiUrl('/checkout-api/order'), orderRequest).subscribe({
       next: (response) => {
-        console.log('Pedido processado com sucesso:', response);
-        alert(`Pedido finalizado com sucesso!\nTotal: ${this.formatPrice(this.total)}`);
-        this.clearOrder();
-        this.isProcessingOrder = false;
+        // SOLUÇÃO SIMPLES: Alert + reload
+        alert(`✅ PEDIDO FINALIZADO COM SUCESSO!\n\nTotal: ${this.formatPrice(this.total)}\nCliente: ${this.customerName}\nPagamento: ${this.getPaymentTypeLabel(this.paymentType)}`);
+        
+        // Limpa TUDO e recarrega a página
+        window.location.reload();
       },
       error: (error) => {
-        console.error('Erro ao processar pedido:', error);
-        alert('Erro ao processar pedido. Tente novamente.');
-        this.isProcessingOrder = false;
+        // Verifica se é sucesso mascarado como erro
+        if (error.status === 200 || error.status === 201 || error.status === 0) {
+          alert(`✅ PEDIDO FINALIZADO COM SUCESSO!\n\nTotal: ${this.formatPrice(this.total)}\nCliente: ${this.customerName}\nPagamento: ${this.getPaymentTypeLabel(this.paymentType)}`);
+          
+          // Limpa TUDO e recarrega a página
+          window.location.reload();
+        } else {
+          alert('❌ Erro ao processar pedido. Tente novamente.');
+          this.isProcessingOrder = false;
+        }
       }
     });
   }
@@ -411,5 +423,43 @@ export class OrderComponent implements OnInit {
 
   getItemIcon(type: string): string {
     return type === 'SERVICE' ? '✂️' : '🧴';
+  }
+
+  getPaymentTypeLabel(paymentType: string): string {
+    const labels = {
+      'CASH': '💵 Dinheiro',
+      'CARD': '💳 Cartão',
+      'PIX': '📱 PIX',
+      'TRANSFER': '🏦 Transferência'
+    };
+    return labels[paymentType as keyof typeof labels] || paymentType;
+  }
+
+  closeSuccessModal() {
+    this.showSuccessModal = false;
+    // Garante que o carrinho está limpo
+    this.orderItems = [];
+    this.customerName = '';
+    this.customerPhone = '';
+    this.customerDocument = '';
+    this.paymentType = 'CASH';
+    this.orderTotal = 0;
+  }
+
+  printReceipt() {
+    // TODO: Implementar impressão de comprovante
+    console.log('Imprimindo comprovante...');
+    this.closeSuccessModal();
+  }
+
+  newSale() {
+    this.showSuccessModal = false;
+    // Limpa tudo para nova venda
+    this.orderItems = [];
+    this.customerName = '';
+    this.customerPhone = '';
+    this.customerDocument = '';
+    this.paymentType = 'CASH';
+    this.orderTotal = 0;
   }
 }

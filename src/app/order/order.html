@@ -132,6 +132,21 @@
             required
           >
         </div>
+
+        <div class="form-group">
+          <label for="paymentType">Forma de Pagamento *</label>
+          <select
+            id="paymentType"
+            [(ngModel)]="paymentType"
+            class="form-control"
+            required
+          >
+            <option value="CASH">💵 Dinheiro</option>
+            <option value="CARD">💳 Cartão</option>
+            <option value="PIX">📱 PIX</option>
+            <option value="TRANSFER">🏦 Transferência</option>
+          </select>
+        </div>
       </div>
 
       <!-- Itens do Pedido -->
@@ -185,6 +200,13 @@
 
       <!-- Totais -->
       <div class="totals-section" *ngIf="orderItems.length > 0">
+        <div class="payment-info">
+          <div class="payment-method">
+            <span class="payment-label">Forma de Pagamento:</span>
+            <span class="payment-type">{{ getPaymentTypeLabel(paymentType) }}</span>
+          </div>
+        </div>
+        
         <div class="total-line total">
           <span>Total:</span>
           <span>{{ formatPrice(total) }}</span>

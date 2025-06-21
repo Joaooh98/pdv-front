@@ -287,6 +287,15 @@
       box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
     }
   }
+
+  select.form-control {
+    cursor: pointer;
+    background-color: white;
+    
+    option {
+      padding: 8px 12px;
+    }
+  }
 }
 
 .order-items {
@@ -409,6 +418,33 @@
 }
 
 .totals-section {
+  .payment-info {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+
+    .payment-method {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .payment-label {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .payment-type {
+        font-size: 14px;
+        font-weight: 600;
+        color: #198754;
+        background: #f0f9f4;
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+    }
+  }
+
   .total-line {
     display: flex;
     justify-content: space-between;
