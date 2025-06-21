@@ -99,7 +99,7 @@ export class OrderComponent implements OnInit {
   customerDocument: string = '';
   
   // Pagamento
-  paymentType: 'CASH' | 'CARD' | 'PIX' | 'TRANSFER' = 'CASH';
+  paymentType: 'CASH' | 'CARD' = 'CASH';
   
   // Totais
   get subtotal(): number {
@@ -429,8 +429,6 @@ export class OrderComponent implements OnInit {
     const labels = {
       'CASH': '💵 Dinheiro',
       'CARD': '💳 Cartão',
-      'PIX': '📱 PIX',
-      'TRANSFER': '🏦 Transferência'
     };
     return labels[paymentType as keyof typeof labels] || paymentType;
   }
