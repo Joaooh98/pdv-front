@@ -1,0 +1,103 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1 class="logo">🪒 PDV Barbearia</h1>
+      <div class="datetime">
+        <span class="date">{{ currentDate }}</span>
+        <span class="time">{{ currentTime }}</span>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="user-info" *ngIf="user">
+        <span class="greeting">{{ getGreeting() }}, {{ user.name }}!</span>
+        <span class="user-role" *ngIf="user.isAdmin">👑 Administrador</span>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        🚪 Sair
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    
+    <!-- Cards de Resumo -->
+    <section class="summary-cards">
+      <div 
+        class="summary-card" 
+        *ngFor="let card of dashboardCards"
+        [class]="'card-' + card.color"
+      >
+        <div class="card-header">
+          <span class="card-icon">{{ card.icon }}</span>
+          <span class="card-title">{{ card.title }}</span>
+        </div>
+        
+        <div class="card-content">
+          <div class="card-value">{{ card.value }}</div>
+          <div class="card-subtitle">{{ card.subtitle }}</div>
+        </div>
+        
+        <div class="card-footer" *ngIf="card.percentage">
+          <span class="trend-indicator" [class]="'trend-' + card.trend">
+            {{ getTrendIcon(card.trend) }} {{ card.percentage }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ações Rápidas -->
+    <section class="quick-actions">
+      <h2 class="section-title">Ações Rápidas</h2>
+      
+      <div class="actions-grid">
+        <button 
+          class="action-card"
+          *ngFor="let action of quickActions"
+          [class]="'action-' + action.color"
+          (click)="action.action && action.action()"
+        >
+          <div class="action-icon">{{ action.icon }}</div>
+          <div class="action-content">
+            <h3 class="action-title">{{ action.title }}</h3>
+            <p class="action-description">{{ action.description }}</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Status da Barbearia -->
+    <section class="status-section">
+      <h2 class="section-title">Status da Barbearia</h2>
+      
+      <div class="status-grid">
+        <div class="status-card">
+          <h3>🕒 Horário de Funcionamento</h3>
+          <p><strong>Seg-Sex:</strong> 08:00 - 18:00</p>
+          <p><strong>Sábado:</strong> 08:00 - 16:00</p>
+          <p><strong>Domingo:</strong> Fechado</p>
+        </div>
+        
+        <div class="status-card">
+          <h3>💺 Cadeiras Disponíveis</h3>
+          <div class="chairs-status">
+            <div class="chair available">Cadeira 1 ✅</div>
+            <div class="chair occupied">Cadeira 2 🔴</div>
+            <div class="chair available">Cadeira 3 ✅</div>
+          </div>
+        </div>
+        
+        <div class="status-card">
+          <h3>📞 Atendimento</h3>
+          <p><strong>WhatsApp:</strong> (11) 99999-9999</p>
+          <p><strong>Telefone:</strong> (11) 3333-3333</p>
+          <p><strong>Status:</strong> <span class="status-online">🟢 Online</span></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>

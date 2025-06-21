@@ -1,0 +1,218 @@
+<div class="order-container">
+  <!-- Header -->
+  <header class="order-header">
+    <button class="back-btn" (click)="goBack()">
+      ← Voltar
+    </button>
+    <h1>🛒 Nova Venda</h1>
+    <div class="header-info" *ngIf="user">
+      <span>Atendente: {{ user.name }}</span>
+    </div>
+  </header>
+
+  <div class="order-content">
+    <!-- Painel Esquerdo - Produtos/Serviços -->
+    <div class="products-panel">
+      
+      <!-- Filtros e Busca -->
+      <div class="filters-section">
+        <div class="tabs">
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'ALL'"
+            (click)="setActiveTab('ALL')"
+          >
+            Todos
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'SERVICE'"
+            (click)="setActiveTab('SERVICE')"
+          >
+            ✂️ Serviços
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'PRODUCT'"
+            (click)="setActiveTab('PRODUCT')"
+          >
+            🧴 Produtos
+          </button>
+        </div>
+
+        <div class="search-box">
+          <input
+            type="text"
+            placeholder="🔍 Buscar itens..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          >
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading" *ngIf="isLoadingServices || isLoadingProducts">
+        <div class="spinner"></div>
+        <span>Carregando itens...</span>
+      </div>
+
+      <!-- Lista de Produtos/Serviços -->
+      <div class="items-grid" *ngIf="!isLoadingServices && !isLoadingProducts">
+        <div 
+          class="item-card"
+          *ngFor="let item of filteredItems"
+          (click)="addToOrder(item)"
+        >
+          <div class="item-header">
+            <span class="item-icon">{{ getItemIcon(item.type) }}</span>
+            <span class="item-type">{{ item.type === 'SERVICE' ? 'Serviço' : 'Produto' }}</span>
+          </div>
+          
+          <h3 class="item-name">{{ item.name }}</h3>
+          
+          <p class="item-description" *ngIf="item.description">
+            {{ item.description }}
+          </p>
+          
+          <div class="item-footer">
+            <span class="item-price">{{ formatPrice(item.price) }}</span>
+            <span class="item-stock" *ngIf="item.type === 'PRODUCT' && item.stock !== undefined">
+              Estoque: {{ item.stock }}
+            </span>
+          </div>
+          
+          <button class="add-btn">+ Adicionar</button>
+        </div>
+        
+        <div class="no-items" *ngIf="filteredItems.length === 0">
+          <span>📦 Nenhum item encontrado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel Direito - Carrinho/Pedido -->
+    <div class="order-panel">
+      
+      <!-- Dados do Cliente -->
+      <div class="customer-section">
+        <h3>👤 Dados do Cliente</h3>
+        
+        <div class="form-group">
+          <label for="customerName">Nome *</label>
+          <input
+            type="text"
+            id="customerName"
+            [(ngModel)]="customerName"
+            placeholder="Nome do cliente"
+            class="form-control"
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="customerPhone">Telefone</label>
+          <input
+            type="tel"
+            id="customerPhone"
+            [(ngModel)]="customerPhone"
+            placeholder="(11) 99999-9999"
+            class="form-control"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="customerDocument">NIF *</label>
+          <input
+            type="text"
+            id="customerDocument"
+            [(ngModel)]="customerDocument"
+            placeholder="123456789"
+            class="form-control"
+            required
+          >
+        </div>
+      </div>
+
+      <!-- Itens do Pedido -->
+      <div class="order-items-section">
+        <h3>📋 Itens do Pedido ({{ orderItems.length }})</h3>
+        
+        <div class="order-items" *ngIf="orderItems.length > 0">
+          <div 
+            class="order-item"
+            *ngFor="let item of orderItems; let i = index"
+          >
+            <div class="item-info">
+              <span class="item-icon">{{ getItemIcon(item.product.type) }}</span>
+              <div class="item-details">
+                <h4>{{ item.product.name }}</h4>
+                <span class="item-type">{{ item.product.type === 'SERVICE' ? 'Serviço' : 'Produto' }}</span>
+              </div>
+            </div>
+            
+            <div class="item-controls">
+              <div class="quantity-control">
+                <button 
+                  class="qty-btn"
+                  (click)="updateQuantity(i, item.quantity - 1)"
+                >-</button>
+                <span class="quantity">{{ item.quantity }}</span>
+                <button 
+                  class="qty-btn"
+                  (click)="updateQuantity(i, item.quantity + 1)"
+                >+</button>
+              </div>
+              
+              <div class="item-price">
+                <span class="unit-price">{{ formatPrice(item.product.price) }}</span>
+                <span class="subtotal">{{ formatPrice(item.subtotal) }}</span>
+              </div>
+              
+              <button 
+                class="remove-btn"
+                (click)="removeFromOrder(i)"
+              >🗑️</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="empty-order" *ngIf="orderItems.length === 0">
+          <span>🛒 Carrinho vazio</span>
+          <p>Adicione produtos ou serviços ao pedido</p>
+        </div>
+      </div>
+
+      <!-- Totais -->
+      <div class="totals-section" *ngIf="orderItems.length > 0">
+        <div class="total-line total">
+          <span>Total:</span>
+          <span>{{ formatPrice(total) }}</span>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="actions-section">
+        <button 
+          class="clear-btn"
+          (click)="clearOrder()"
+          [disabled]="orderItems.length === 0"
+        >
+          🗑️ Limpar
+        </button>
+        
+        <button 
+          class="process-btn"
+          (click)="processOrder()"
+          [disabled]="orderItems.length === 0 || !customerName.trim() || !customerDocument.trim() || isProcessingOrder"
+        >
+          <span *ngIf="!isProcessingOrder">💳 Finalizar Venda</span>
+          <span *ngIf="isProcessingOrder" class="loading">
+            <span class="spinner-sm"></span>
+            Processando...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

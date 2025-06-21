@@ -1,0 +1,60 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>PDV Barbearia</h1>
+      <p>Faça login para acessar o sistema</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="usuario">Usuário</label>
+        <input 
+          type="text" 
+          id="usuario"
+          name="usuario"
+          [(ngModel)]="usuario"
+          (input)="clearError()"
+          placeholder="Digite seu usuário"
+          class="form-control"
+          [disabled]="isLoading"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input 
+          type="password" 
+          id="senha"
+          name="senha"
+          [(ngModel)]="senha"
+          (input)="clearError()"
+          placeholder="Digite sua senha"
+          class="form-control"
+          [disabled]="isLoading"
+          required
+        >
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button 
+        type="submit" 
+        class="login-button"
+        [disabled]="isLoading || !usuario.trim() || !senha.trim()"
+      >
+        <span *ngIf="!isLoading">Entrar</span>
+        <span *ngIf="isLoading" class="loading">
+          <span class="spinner"></span>
+          Entrando...
+        </span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Sistema de Ponto de Venda</p>
+    </div>
+  </div>
+</div>
