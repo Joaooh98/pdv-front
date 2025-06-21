@@ -119,7 +119,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadUserData();
@@ -178,8 +178,8 @@ export class DashboardComponent implements OnInit {
   }
 
   viewReports() {
-    console.log('Visualizando relatórios...');
-    // TODO: Implementar navegação para tela de relatórios
+    console.log('Navegando para relatórios...');
+    this.router.navigate(['/reports']);
   }
 
   logout() {

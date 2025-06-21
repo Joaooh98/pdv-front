@@ -1,1 +1,325 @@
-<p>report works!</p>
+<div class="report-container">
+  <!-- Header -->
+  <header class="report-header">
+    <button class="back-btn" (click)="goBack()">
+      ← Voltar
+    </button>
+    <h1>📊 Relatórios</h1>
+    <div class="header-info" *ngIf="user">
+      <span>{{ user.name }}</span>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="report-tabs">
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'orders'"
+      (click)="setActiveTab('orders')"
+    >
+      🛒 Pedidos
+    </button>
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'finances'"
+      (click)="setActiveTab('finances')"
+    >
+      💰 Financeiro
+    </button>
+    <button 
+      class="tab-btn"
+      [class.active]="activeTab === 'metrics'"
+      (click)="setActiveTab('metrics')"
+    >
+      📈 Métricas
+    </button>
+  </nav>
+
+  <div class="report-content">
+    
+    <!-- TAB: PEDIDOS -->
+    <div class="tab-content" *ngIf="activeTab === 'orders'">
+      
+      <!-- Filtros de Data -->
+      <section class="filters-section">
+        <h2>🗓️ Filtros</h2>
+        <div class="date-filters">
+          <div class="form-group">
+            <label for="startDate">Data Início:</label>
+            <input
+              type="date"
+              id="startDate"
+              [(ngModel)]="startDate"
+              (change)="onDateChange()"
+              class="form-control"
+            >
+          </div>
+          <div class="form-group">
+            <label for="endDate">Data Fim:</label>
+            <input
+              type="date"
+              id="endDate"
+              [(ngModel)]="endDate"
+              (change)="onDateChange()"
+              class="form-control"
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Resumo dos Pedidos -->
+      <section class="summary-section">
+        <h2>📋 Resumo do Período</h2>
+        <div class="summary-grid">
+          <div class="summary-card total">
+            <div class="card-icon">💰</div>
+            <div class="card-info">
+              <h3>Total de Vendas</h3>
+              <p class="card-value">{{ formatPrice(totalVendas) }}</p>
+            </div>
+          </div>
+          
+          <div class="summary-card orders">
+            <div class="card-icon">📦</div>
+            <div class="card-info">
+              <h3>Total de Pedidos</h3>
+              <p class="card-value">{{ totalPedidos }}</p>
+            </div>
+          </div>
+          
+          <div class="summary-card cash">
+            <div class="card-icon">💵</div>
+            <div class="card-info">
+              <h3>Vendas em Dinheiro</h3>
+              <p class="card-value">{{ formatPrice(vendasDinheiro) }}</p>
+            </div>
+          </div>
+          
+          <div class="summary-card card">
+            <div class="card-icon">💳</div>
+            <div class="card-info">
+              <h3>Vendas no Cartão</h3>
+              <p class="card-value">{{ formatPrice(vendasCartao) }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Resumo por Profissional (Admin) -->
+      <section class="professionals-section" *ngIf="user?.isAdmin && professionalInfos.length > 1">
+        <h2>👥 Resumo por Profissional</h2>
+        <div class="professionals-grid">
+          <div class="professional-card" *ngFor="let info of professionalInfos">
+            <div class="professional-header">
+              <h3>{{ info.name }}</h3>
+              <span class="professional-total">{{ formatPrice(info.amount) }}</span>
+            </div>
+            <div class="professional-details">
+              <div class="detail-item">
+                <span class="label">💵 Dinheiro:</span>
+                <span class="value">{{ formatPrice(info.amountCash) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">💳 Cartão:</span>
+                <span class="value">{{ formatPrice(info.amountCard) }}</span>
+              </div>
+              <div class="detail-item" *ngIf="info.amountComission > 0">
+                <span class="label">💼 Comissão:</span>
+                <span class="value">{{ formatPrice(info.amountComission) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Lista de Pedidos -->
+      <section class="orders-section">
+        <h2>📄 Detalhes dos Pedidos</h2>
+        
+        <div class="loading" *ngIf="isLoadingOrders">
+          <div class="spinner"></div>
+          <span>Carregando pedidos...</span>
+        </div>
+        
+        <div class="orders-list" *ngIf="!isLoadingOrders && orders.length > 0">
+          <div class="order-card" *ngFor="let order of orders">
+            <div class="order-header">
+              <div class="order-info">
+                <h3>Pedido #{{ order.id.substring(0, 8) }}</h3>
+                <span class="order-date">{{ formatDate(order.dateCreate) }}</span>
+                <span class="order-provider" *ngIf="order.acquirerId">{{ order.provider }} - {{ order.acquirerId }}</span>
+              </div>
+              <div class="order-total">
+                <span class="amount">{{ formatPrice(order.amount) }}</span>
+                <span class="payment-type" *ngIf="order.payments && order.payments.length > 0">{{ getPaymentTypeIcon(order.payments[0].paymentType) }}</span>
+                <span class="finance-badge" *ngIf="order.finance">💼</span>
+              </div>
+            </div>
+            
+            <div class="order-professional">
+              <span class="professional-name">👤 {{ order.professional.name }}</span>
+              <span class="professional-username">({{ order.professional.username }})</span>
+              <span class="admin-badge" *ngIf="order.professional.admin">Admin</span>
+            </div>
+            
+            <div class="order-items">
+              <h4>Itens:</h4>
+              <div class="item-list">
+                <div class="item" *ngFor="let item of order.items">
+                  <span class="item-name">{{ item.product.description }}</span>
+                  <span class="item-qty">Qtd: {{ item.product.quantity }}</span>
+                  <span class="item-price">{{ formatPrice(item.product.amountSale) }}</span>
+                  <span class="item-commission" *ngIf="item.product.commission > 0">
+                    ({{ item.product.commission }}% comissão)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-fees" *ngIf="order.fee.length > 0">
+              <h4>Taxas:</h4>
+              <div class="fee-list">
+                <div class="fee-item" *ngFor="let feeItem of order.fee">
+                  <span class="fee-name">{{ feeItem.fee.description }}</span>
+                  <span class="fee-percentage">{{ feeItem.fee.percentage }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-commission" *ngIf="order.amountCommission > 0">
+              <span class="commission-label">💼 Comissão:</span>
+              <span class="commission-value">{{ formatPrice(order.amountCommission) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="no-orders" *ngIf="!isLoadingOrders && orders.length === 0">
+          <span>📦 Nenhum pedido encontrado no período selecionado</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB: FINANCEIRO -->
+    <div class="tab-content" *ngIf="activeTab === 'finances'">
+      
+      <!-- Saldo Total -->
+      <section class="balance-summary">
+        <h2>💼 Saldo Total</h2>
+        <div class="total-balance-card">
+          <div class="balance-icon">💰</div>
+          <div class="balance-info">
+            <h3>Saldo Consolidado</h3>
+            <p class="total-amount">{{ formatPrice(getTotalBalance()) }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contas -->
+      <section class="accounts-section">
+        <h2>🏦 Saldo por Conta</h2>
+        
+        <div class="loading" *ngIf="isLoadingAccounts || isLoadingBalances">
+          <div class="spinner"></div>
+          <span>Carregando saldos...</span>
+        </div>
+        
+        <div class="accounts-grid" *ngIf="!isLoadingAccounts && !isLoadingBalances">
+          <div class="account-card" *ngFor="let account of accounts">
+            <div class="account-header">
+              <span class="account-icon">{{ getAccountIcon(account.provider) }}</span>
+              <div class="account-info">
+                <h3>{{ account.name }}</h3>
+                <span class="account-provider">{{ account.provider }}</span>
+              </div>
+            </div>
+            <div class="account-balance">
+              <span class="balance-amount">{{ formatPrice(getAccountBalance(account.id)) }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB: MÉTRICAS -->
+    <div class="tab-content" *ngIf="activeTab === 'metrics'">
+      
+      <section class="metrics-section">
+        <h2>📊 Métricas de Performance</h2>
+        
+        <div class="metrics-grid">
+          <div class="metric-card entrada">
+            <div class="metric-header">
+              <span class="metric-icon">📈</span>
+              <h3>Valor Entrada Diária</h3>
+            </div>
+            <div class="metric-value">{{ formatPrice(metrics.valorEntradaDiaria) }}</div>
+            <div class="metric-subtitle">Receita do dia atual</div>
+          </div>
+          
+          <div class="metric-card previsto">
+            <div class="metric-header">
+              <span class="metric-icon">🎯</span>
+              <h3>Faturamento Previsto</h3>
+            </div>
+            <div class="metric-value">{{ formatPrice(metrics.faturamentoPrevisto) }}</div>
+            <div class="metric-subtitle">Meta mensal</div>
+          </div>
+          
+          <div class="metric-card dias">
+            <div class="metric-header">
+              <span class="metric-icon">📅</span>
+              <h3>Dias Percorridos</h3>
+            </div>
+            <div class="metric-value">{{ metrics.diasPercorridos }}</div>
+            <div class="metric-subtitle">Dias do mês atual</div>
+          </div>
+          
+          <div class="metric-card ticket">
+            <div class="metric-header">
+              <span class="metric-icon">🎫</span>
+              <h3>Ticket Médio</h3>
+            </div>
+            <div class="metric-value">{{ formatPrice(metrics.ticketMedio) }}</div>
+            <div class="metric-subtitle">Valor médio por atendimento</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Análise de Performance -->
+      <section class="performance-section">
+        <h2>🔍 Análise de Performance</h2>
+        
+        <div class="performance-cards">
+          <div class="performance-card">
+            <h3>💹 Progresso da Meta</h3>
+            <div class="progress-info">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="(metrics.valorEntradaDiaria / metrics.faturamentoPrevisto) * 100"></div>
+              </div>
+              <span class="progress-text">
+                {{ ((metrics.valorEntradaDiaria / metrics.faturamentoPrevisto) * 100).toFixed(1) }}% da meta
+              </span>
+            </div>
+          </div>
+          
+          <div class="performance-card">
+            <h3>📊 Distribuição de Pagamentos</h3>
+            <div class="payment-distribution">
+              <div class="payment-item">
+                <span class="payment-label">💵 Dinheiro:</span>
+                <span class="payment-value">{{ formatPrice(vendasDinheiro) }}</span>
+                <span class="payment-percent">({{ totalVendas > 0 ? ((vendasDinheiro / totalVendas) * 100).toFixed(1) : 0 }}%)</span>
+              </div>
+              <div class="payment-item">
+                <span class="payment-label">💳 Cartão:</span>
+                <span class="payment-value">{{ formatPrice(vendasCartao) }}</span>
+                <span class="payment-percent">({{ totalVendas > 0 ? ((vendasCartao / totalVendas) * 100).toFixed(1) : 0 }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</div>
