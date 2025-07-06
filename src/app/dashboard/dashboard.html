@@ -1,4 +1,7 @@
 <div class="dashboard-container">
+  <!-- Componente de aviso de sessão -->
+  <app-session-warning></app-session-warning>
+  
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-left">
@@ -17,6 +20,10 @@
         <div class="user-info">
           <span class="greeting">{{ getGreeting() }}, {{ user.name }}</span>
           <span class="user-badge" *ngIf="user.isAdmin">Administrador</span>
+          <!-- Indicador de sessão (para debug) -->
+          <span class="session-indicator" title="Tempo restante da sessão">
+            ⏰ {{ getSessionTimeRemaining() }}
+          </span>
         </div>
         <button class="logout-btn" (click)="logout()">
           <span>Sair</span>

@@ -1,0 +1,134 @@
+.session-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.session-warning-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  justify-content: center;
+}
+
+.warning-icon {
+  font-size: 32px;
+}
+
+.warning-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #dc2626;
+  margin: 0;
+}
+
+.warning-content {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.warning-content p {
+  margin: 8px 0;
+  color: #374151;
+  font-size: 16px;
+}
+
+.warning-content strong {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.warning-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-logout,
+.btn-continue {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.btn-logout {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-logout:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.btn-continue {
+  background: #059669;
+  color: white;
+}
+
+.btn-continue:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.countdown-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.countdown-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dc2626 0%, #f59e0b 100%);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+@media (max-width: 480px) {
+  .session-warning-modal {
+    padding: 24px;
+    margin: 20px;
+  }
+  
+  .warning-actions {
+    flex-direction: column;
+  }
+}

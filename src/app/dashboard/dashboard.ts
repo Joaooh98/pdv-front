@@ -1,6 +1,9 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+import { SessionWarningComponent } from '../session-warning/session-warning';
+import { Subscription } from 'rxjs';
 
 interface UserData {
   email: string;
@@ -32,14 +35,16 @@ interface DashboardCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SessionWarningComponent], // Adiciona o SessionWarningComponent
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   user: UserData | null = null;
   currentDate: string = '';
   currentTime: string = '';
+  
+  private subscriptions: Subscription[] = [];
 
   // Cards do dashboard
   dashboardCards: DashboardCard[] = [
@@ -118,25 +123,37 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private authService: AuthService, // Usa AuthService em vez de acessar localStorage
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
   ngOnInit() {
-    this.loadUserData();
+    this.subscribeToUser();
     this.updateDateTime();
     this.startClock();
+    
+    // Verifica se usuário está logado
+    if (!this.authService.isLoggedIn || !this.authService.isSessionValid()) {
+      this.router.navigate(['/login']);
+    }
   }
 
-  private loadUserData() {
-    if (isPlatformBrowser(this.platformId)) {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        this.user = JSON.parse(userData);
-      } else {
-        // Se não tem dados do usuário, redireciona para login
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private subscribeToUser() {
+    // Subscreve às mudanças do usuário
+    const userSubscription = this.authService.user$.subscribe(user => {
+      this.user = user;
+      
+      // Se usuário foi deslogado, redireciona
+      if (!user) {
         this.router.navigate(['/login']);
       }
-    }
+    });
+    
+    this.subscriptions.push(userSubscription);
   }
 
   private updateDateTime() {
@@ -183,11 +200,8 @@ export class DashboardComponent implements OnInit {
   }
 
   logout() {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-    }
-    this.router.navigate(['/login']);
+    // Usa o AuthService para fazer logout
+    this.authService.logout('Logout solicitado pelo usuário');
   }
 
   getTrendIcon(trend: string): string {
@@ -203,5 +217,12 @@ export class DashboardComponent implements OnInit {
     if (hour < 12) return 'Bom dia';
     if (hour < 18) return 'Boa tarde';
     return 'Boa noite';
+  }
+
+  // Método para verificar tempo restante da sessão (para debug)
+  getSessionTimeRemaining(): string {
+    const remaining = this.authService.getTimeRemaining();
+    const seconds = Math.floor(remaining / 1000);
+    return `${seconds}s`;
   }
 }

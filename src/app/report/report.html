@@ -102,6 +102,14 @@
               <p class="card-value">{{ formatPrice(vendasCartao) }}</p>
             </div>
           </div>
+
+          <div class="summary-card fee">
+            <div class="card-icon">🧾</div>
+            <div class="card-info">
+              <h3>Total de Taxas</h3>
+              <p class="card-value">{{ formatPrice(totalAmountFee) }}</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -127,6 +135,12 @@
                 <span class="label">💼 Comissão:</span>
                 <span class="value">{{ formatPrice(info.amountComission) }}</span>
               </div>
+              <div class="detail-item">
+                <span class="label">🧾 Taxas:</span>
+                <span class="value">{{ formatPrice(info.amountFee) }}</span>
+              </div>
+              <!-- Exibe todos os campos relevantes vindos do backend -->
+              <!-- Adicione outros campos aqui se necessário -->
             </div>
           </div>
         </div>

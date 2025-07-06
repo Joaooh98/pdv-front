@@ -1,12 +1,9 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
-interface LoginResponse {
-  data: string;
-}
+import { AuthService } from '../auth.service'; // Importe o serviço
 
 interface UserData {
   email: string;
@@ -22,7 +19,7 @@ interface UserData {
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   usuario: string = '';
   senha: string = '';
   isLoading: boolean = false;
@@ -31,16 +28,20 @@ export class LoginComponent {
   constructor(
     private router: Router,
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    private authService: AuthService // Injeta o AuthService
   ) {}
 
-  private getApiUrl(): string {
-    if (isPlatformBrowser(this.platformId)) {
-      return window.location.hostname !== 'localhost' ? 
-        'http://147.79.101.18:8991/professional/token' : 
-        'http://localhost:8991/professional/token';
+  ngOnInit() {
+    // Se já está logado e sessão é válida, redireciona
+    if (this.authService.isLoggedIn && this.authService.isSessionValid()) {
+      this.router.navigate(['/dashboard']);
     }
-    return 'http://localhost:8991/professional/token'; // Default para servidor
+  }
+
+  private getApiUrl(): string {
+    return window.location.hostname !== 'localhost' ? 
+      'http://147.79.101.18:8991/professional/token' : 
+      'http://localhost:8991/professional/token';
   }
 
   onSubmit() {
@@ -67,12 +68,11 @@ export class LoginComponent {
         if (response && response.id && response.name) {
           console.log('Login bem-sucedido:', response);
           
-          // Salva os dados do usuário no localStorage (apenas no browser)
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('user', JSON.stringify(response));
-            // Não temos token, mas salvamos os dados mesmo assim
-            localStorage.setItem('loginData', JSON.stringify(response));
-          }
+          // USA O AUTHSERVICE em vez do localStorage diretamente
+          this.authService.login(response);
+          
+          // Exibe mensagem de sucesso com informações da sessão
+          alert(`✅ Login realizado com sucesso!\n\n👤 Usuário: ${response.name}\n⏰ Sessão: 1 minuto de inatividade\n\nVocê será deslogado automaticamente após 1 minuto sem atividade.`);
           
           // Redireciona para o dashboard
           this.router.navigate(['/dashboard']);

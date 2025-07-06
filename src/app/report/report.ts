@@ -58,11 +58,14 @@ interface OrderData {
 }
 
 interface ProfessionalInfo {
+  id?: number | string; // Caso o backend envie id
+  name: string;
   amount: number;
   amountCard: number;
   amountCash: number;
   amountComission: number;
-  name: string;
+  amountFee: number;
+  // Adicione outros campos conforme necessário
 }
 
 interface OrdersResponse {
@@ -72,6 +75,7 @@ interface OrdersResponse {
   totalAmountCard: number;
   totalAmountCash: number;
   totalAmountDiscont: number;
+  totalAmountFee: number;
   totalOrders: number;
 }
 
@@ -150,6 +154,10 @@ export class ReportComponent implements OnInit {
     return this.ordersResponse?.totalAmountDiscont || 0;
   }
   
+  get totalAmountFee(): number {
+    return this.ordersResponse?.totalAmountFee || 0;
+  }
+  
   // Estado da interface
   activeTab: 'orders' | 'finances' | 'metrics' = 'orders';
 
@@ -188,7 +196,6 @@ export class ReportComponent implements OnInit {
   private loadInitialData() {
     this.loadOrders();
     this.loadAccounts();
-    this.loadMockMetrics(); // Mock até API ficar pronta
   }
 
   private getApiUrl(endpoint: string, port: string = '8991'): string {
@@ -208,110 +215,26 @@ export class ReportComponent implements OnInit {
     
     this.http.get<OrdersResponse>(url).subscribe({
       next: (response) => {
-        console.log('Resposta da API de pedidos:', response);
         this.ordersResponse = response;
-        this.orders = response.orders || [];
-        this.professionalInfos = response.infos || [];
+        this.orders = response.orders;
+        this.professionalInfos = response.infos;
         this.updateMetricsFromOrders();
         this.isLoadingOrders = false;
       },
       error: (error) => {
         console.error('Erro ao carregar pedidos:', error);
-        // Carrega dados mock em caso de erro
-        this.loadMockOrders();
         this.isLoadingOrders = false;
       }
     });
-  }
-
-  private loadMockOrders() {
-    console.log('Carregando pedidos mock...');
-    
-    // Mock baseado na estrutura real da API
-    const mockResponse: OrdersResponse = {
-      infos: [
-        {
-          amount: 62.00,
-          amountCard: 62.00,
-          amountCash: 0,
-          amountComission: 26.66,
-          name: this.user?.name || "Usuário Mock"
-        }
-      ],
-      orders: [
-        {
-          id: '50f4247d-cdc9-45c3-8a37-ba3e18915522',
-          acquirerId: '258085867',
-          amount: 15.00,
-          amountCommission: 6.45,
-          dateCreate: '2025-06-21T18:43:40',
-          finance: true,
-          fee: [
-            {
-              fee: {
-                description: 'IVA',
-                id: 'f5086e43-b820-476c-ae81-aff49bb2f44d',
-                percentage: 23
-              },
-              id: 'c7c85f1c-bc28-41ce-ace2-c1c1e3118f1e'
-            }
-          ],
-          items: [
-            {
-              id: '6a5be4ea-6c5b-420d-9a94-b7c86537e885',
-              product: {
-                acquirerId: '252763527',
-                amountCost: 0.00,
-                amountSale: 15.00,
-                commission: 43,
-                description: 'Corte com desconto',
-                id: 'c3bcb3b0-58fa-4eef-85d6-8a8550059b88',
-                quantity: 1,
-                type: 'SERVICE'
-              }
-            }
-          ],
-          payments: [
-            {
-              amount: 15.00,
-              coinType: 'EUR',
-              id: '77842e10-a0ee-4a49-ae8a-814cad050322',
-              paymentType: 'CARD'
-            }
-          ],
-          professional: {
-            admin: false,
-            document: '14839868026',
-            email: 'usuario@email.com',
-            id: this.user?.id || 'mock-id',
-            name: this.user?.name || 'Usuário Mock',
-            password: '****',
-            username: 'Usuario'
-          },
-          provider: 'VENDUS'
-        }
-      ],
-      totalAmount: 62.00,
-      totalAmountCard: 62.00,
-      totalAmountCash: 0,
-      totalAmountDiscont: 0,
-      totalOrders: 4
-    };
-    
-    this.ordersResponse = mockResponse;
-    this.orders = mockResponse.orders;
-    this.professionalInfos = mockResponse.infos;
-    this.updateMetricsFromOrders();
   }
 
   private updateMetricsFromOrders() {
     // Atualiza métricas baseado nos dados reais
     const today = new Date();
     const currentDay = today.getDate();
-    
     this.metrics = {
       valorEntradaDiaria: this.totalVendas,
-      faturamentoPrevisto: 2500.00, // Mock - será implementado quando API estiver pronta
+      faturamentoPrevisto: 2500.00, // TODO: Atualizar quando backend fornecer
       diasPercorridos: currentDay,
       ticketMedio: this.totalPedidos > 0 ? this.totalVendas / this.totalPedidos : 0
     };
@@ -325,37 +248,15 @@ export class ReportComponent implements OnInit {
     
     this.http.get<AccountData[]>(url).subscribe({
       next: (accounts) => {
-        console.log('Contas carregadas:', accounts);
         this.accounts = accounts || [];
         this.loadAccountBalances();
         this.isLoadingAccounts = false;
       },
       error: (error) => {
         console.error('Erro ao carregar contas:', error);
-        // Carrega dados mock em caso de erro
-        this.loadMockAccounts();
         this.isLoadingAccounts = false;
       }
     });
-  }
-
-  private loadMockAccounts() {
-    console.log('Carregando contas mock...');
-    this.accounts = [
-      {
-        id: 'baafb18f-301a-483f-a3f2-77b34f15eb55',
-        name: 'BPI-SOCIOS',
-        provider: 'BPI',
-        createdAt: '2025-06-14T12:23:09.855072845'
-      },
-      {
-        id: '181d4fd0-837f-40a4-b747-a24528cd7dd2',
-        name: 'NUMERARIO-SOCIOS',
-        provider: 'CASH',
-        createdAt: '2025-06-14T12:23:09.855072845'
-      }
-    ];
-    this.loadMockBalances();
   }
 
   private loadAccountBalances() {
@@ -364,7 +265,7 @@ export class ReportComponent implements OnInit {
     const balancePromises = this.accounts.map(account => {
       const url = this.getApiUrl(`/api/v1/account?accountId=${account.id}`, '8999');
       return this.http.get<{balance: number, currency: string}>(url).toPromise()
-        .then(data => {
+        .then((data) => {
           if (data) {
             this.accountBalances.set(account.id, {
               accountId: account.id,
@@ -373,40 +274,14 @@ export class ReportComponent implements OnInit {
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(`Erro ao carregar saldo da conta ${account.name}:`, error);
-          // Saldo mock em caso de erro
-          this.accountBalances.set(account.id, {
-            accountId: account.id,
-            balance: account.provider === 'CASH' ? 250.75 : 1500.30,
-            currency: 'EUR'
-          });
         });
     });
     
     Promise.all(balancePromises).then(() => {
       this.isLoadingBalances = false;
     });
-  }
-
-  private loadMockBalances() {
-    this.accountBalances.set('baafb18f-301a-483f-a3f2-77b34f15eb55', {
-      accountId: 'baafb18f-301a-483f-a3f2-77b34f15eb55',
-      balance: 1500.30,
-      currency: 'EUR'
-    });
-    
-    this.accountBalances.set('181d4fd0-837f-40a4-b747-a24528cd7dd2', {
-      accountId: '181d4fd0-837f-40a4-b747-a24528cd7dd2',
-      balance: 250.75,
-      currency: 'EUR'
-    });
-  }
-
-  // === MÉTRICAS (MOCK) ===
-  private loadMockMetrics() {
-    // Chama updateMetricsFromOrders que já faz o cálculo
-    this.updateMetricsFromOrders();
   }
 
   // === MÉTODOS DE INTERFACE ===

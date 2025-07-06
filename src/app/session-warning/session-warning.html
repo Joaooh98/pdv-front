@@ -1,0 +1,26 @@
+<div class="session-warning-overlay" *ngIf="showWarning">
+  <div class="session-warning-modal">
+    <div class="warning-header">
+      <span class="warning-icon">⚠️</span>
+      <h3>Sessão Expirando</h3>
+    </div>
+    
+    <div class="warning-content">
+      <p>Sua sessão expirará em <strong>{{ timeRemaining }}s</strong></p>
+      <p>Clique em "Continuar" para estender a sessão</p>
+    </div>
+    
+    <div class="warning-actions">
+      <button class="btn-logout" (click)="logout()">
+        🚪 Sair Agora
+      </button>
+      <button class="btn-continue" (click)="extendSession()">
+        ⏰ Continuar
+      </button>
+    </div>
+    
+    <div class="countdown-bar">
+      <div class="countdown-fill" [style.width.%]="progressPercentage"></div>
+    </div>
+  </div>
+</div>

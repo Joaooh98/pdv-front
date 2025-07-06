@@ -90,6 +90,9 @@
 
 .user-info {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .greeting {
@@ -106,8 +109,48 @@
   background: rgba(139, 92, 246, 0.1);
   padding: 4px 8px;
   border-radius: 6px;
-  margin-top: 4px;
   display: inline-block;
+  align-self: flex-end;
+}
+
+/* === INDICADOR DE SESSÃO === */
+.session-indicator {
+  font-size: 11px;
+  color: #059669;
+  font-weight: 600;
+  background: rgba(5, 150, 105, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  align-self: flex-end;
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.session-indicator:hover {
+  background: rgba(5, 150, 105, 0.15);
+  transform: scale(1.05);
+}
+
+/* Estados do indicador baseado no tempo restante */
+.session-indicator.warning {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.session-indicator.critical {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.2);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .logout-btn {
@@ -459,5 +502,15 @@
 
   .action-card {
     padding: 16px;
+  }
+
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .session-indicator {
+    align-self: flex-start;
   }
 }
