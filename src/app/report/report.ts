@@ -106,6 +106,7 @@ interface DashboardMetrics {
   templateUrl: './report.html',
   styleUrl: './report.scss'
 })
+
 export class ReportComponent implements OnInit {
   user: UserData | null = null;
   
@@ -113,10 +114,10 @@ export class ReportComponent implements OnInit {
   startDate: string = '';
   endDate: string = '';
   
-  // Dados dos pedidos
+  // Dados dos pedidos - INICIALIZAÇÃO CORRETA
   ordersResponse: OrdersResponse | null = null;
   orders: OrderData[] = [];
-  professionalInfos: ProfessionalInfo[] = [];
+  professionalInfos: ProfessionalInfo[] = []; // Inicializar como array vazio
   isLoadingOrders: boolean = false;
   
   // Dados das contas
@@ -198,7 +199,7 @@ export class ReportComponent implements OnInit {
     this.loadAccounts();
   }
 
-  private getApiUrl(endpoint: string, port: string = '8991'): string {
+  private getApiUrl(endpoint: string, port: string = '3636'): string {
     const base = isPlatformBrowser(this.platformId) && window.location.hostname !== 'localhost' ? 
       `http://147.79.101.18:${port}` : 
       `http://localhost:${port}`;
@@ -216,16 +217,24 @@ export class ReportComponent implements OnInit {
     this.http.get<OrdersResponse>(url).subscribe({
       next: (response) => {
         this.ordersResponse = response;
-        this.orders = response.orders;
-        this.professionalInfos = response.infos;
+        this.orders = response.orders || []; // Garantir que seja array
+        this.professionalInfos = response.infos || []; // Garantir que seja array
         this.updateMetricsFromOrders();
         this.isLoadingOrders = false;
       },
       error: (error) => {
         console.error('Erro ao carregar pedidos:', error);
+        // Garantir que arrays estejam inicializados mesmo em caso de erro
+        this.orders = [];
+        this.professionalInfos = [];
         this.isLoadingOrders = false;
       }
     });
+  }
+
+  // Método auxiliar para verificar se deve mostrar seção de profissionais
+  shouldShowProfessionalsSection(): boolean {
+    return !!(this.user?.isAdmin && this.professionalInfos && this.professionalInfos.length > 1);
   }
 
   private updateMetricsFromOrders() {

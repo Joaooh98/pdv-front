@@ -135,8 +135,8 @@ export class OrderComponent implements OnInit {
 
   private getApiUrl(endpoint: string): string {
     const base = isPlatformBrowser(this.platformId) && window.location.hostname !== 'localhost' ? 
-      'http://147.79.101.18:8991' : 
-      'http://localhost:8991';
+      'http://147.79.101.18:3636' : 
+      'http://localhost:3636';
     return `${base}${endpoint}`;
   }
 

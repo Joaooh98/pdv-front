@@ -40,8 +40,8 @@ export class LoginComponent implements OnInit {
 
   private getApiUrl(): string {
     return window.location.hostname !== 'localhost' ? 
-      'http://147.79.101.18:8991/professional/token' : 
-      'http://localhost:8991/professional/token';
+      'http://147.79.101.18:3636/professional/token' : 
+      'http://localhost:3636/professional/token';
   }
 
   onSubmit() {
