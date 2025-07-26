@@ -58,14 +58,13 @@ interface OrderData {
 }
 
 interface ProfessionalInfo {
-  id?: number | string; // Caso o backend envie id
+  id?: number | string;
   name: string;
   amount: number;
   amountCard: number;
   amountCash: number;
   amountComission: number;
   amountFee: number;
-  // Adicione outros campos conforme necessário
 }
 
 interface OrdersResponse {
@@ -84,12 +83,13 @@ interface AccountData {
   name: string;
   provider: string;
   createdAt: string;
-}
-
-interface AccountBalance {
-  accountId: string;
-  balance: number;
-  currency: string;
+  balance: {
+    balanceNow: number;
+    balancePrevious: number;
+    coin: string;
+    lastMovementValue: number;
+  };
+  persons: string[];
 }
 
 interface DashboardMetrics {
@@ -109,64 +109,56 @@ interface DashboardMetrics {
 
 export class ReportComponent implements OnInit {
   user: UserData | null = null;
-  
-  // Filtros de data
+
   startDate: string = '';
   endDate: string = '';
-  
-  // Dados dos pedidos - INICIALIZAÇÃO CORRETA
+
   ordersResponse: OrdersResponse | null = null;
   orders: OrderData[] = [];
-  professionalInfos: ProfessionalInfo[] = []; // Inicializar como array vazio
+  professionalInfos: ProfessionalInfo[] = []; 
   isLoadingOrders: boolean = false;
-  
-  // Dados das contas
+
   accounts: AccountData[] = [];
-  accountBalances: Map<string, AccountBalance> = new Map();
   isLoadingAccounts: boolean = false;
-  isLoadingBalances: boolean = false;
-  
-  // Métricas do dashboard
+
   metrics: DashboardMetrics = {
     valorEntradaDiaria: 0,
     faturamentoPrevisto: 0,
     diasPercorridos: 0,
     ticketMedio: 0
   };
-  
-  // Totais da API
+
   get totalVendas(): number {
     return this.ordersResponse?.totalAmount || 0;
   }
-  
+
   get totalPedidos(): number {
     return this.ordersResponse?.totalOrders || 0;
   }
-  
+
   get vendasDinheiro(): number {
     return this.ordersResponse?.totalAmountCash || 0;
   }
-  
+
   get vendasCartao(): number {
     return this.ordersResponse?.totalAmountCard || 0;
   }
-  
+
   get totalDesconto(): number {
     return this.ordersResponse?.totalAmountDiscont || 0;
   }
-  
+
   get totalAmountFee(): number {
     return this.ordersResponse?.totalAmountFee || 0;
   }
-  
-  // Estado da interface
+
   activeTab: 'orders' | 'finances' | 'metrics' = 'orders';
 
   constructor(
     private router: Router,
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadUserData();
@@ -189,7 +181,7 @@ export class ReportComponent implements OnInit {
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     this.startDate = today.toISOString().split('T')[0];
     this.endDate = tomorrow.toISOString().split('T')[0];
   }
@@ -200,31 +192,29 @@ export class ReportComponent implements OnInit {
   }
 
   private getApiUrl(endpoint: string, port: string = '3636'): string {
-    const base = isPlatformBrowser(this.platformId) && window.location.hostname !== 'localhost' ? 
-      `http://147.79.101.18:${port}` : 
+    const base = isPlatformBrowser(this.platformId) && window.location.hostname !== 'localhost' ?
+      `http://147.79.101.18:${port}` :
       `http://localhost:${port}`;
     return `${base}${endpoint}`;
   }
 
-  // === PEDIDOS ===
   loadOrders() {
     if (!this.user?.id) return;
-    
+
     this.isLoadingOrders = true;
-    
+
     const url = this.getApiUrl(`/checkout-api/orders?dateCreate=${this.startDate}&dateEnd=${this.endDate}&professionalId=${this.user.id}`);
-    
+
     this.http.get<OrdersResponse>(url).subscribe({
       next: (response) => {
         this.ordersResponse = response;
-        this.orders = response.orders || []; // Garantir que seja array
-        this.professionalInfos = response.infos || []; // Garantir que seja array
+        this.orders = response.orders || []; 
+        this.professionalInfos = response.infos || []; 
         this.updateMetricsFromOrders();
         this.isLoadingOrders = false;
       },
       error: (error) => {
         console.error('Erro ao carregar pedidos:', error);
-        // Garantir que arrays estejam inicializados mesmo em caso de erro
         this.orders = [];
         this.professionalInfos = [];
         this.isLoadingOrders = false;
@@ -232,68 +222,41 @@ export class ReportComponent implements OnInit {
     });
   }
 
-  // Método auxiliar para verificar se deve mostrar seção de profissionais
   shouldShowProfessionalsSection(): boolean {
     return !!(this.user?.isAdmin && this.professionalInfos && this.professionalInfos.length > 1);
   }
 
   private updateMetricsFromOrders() {
-    // Atualiza métricas baseado nos dados reais
     const today = new Date();
     const currentDay = today.getDate();
     this.metrics = {
       valorEntradaDiaria: this.totalVendas,
-      faturamentoPrevisto: 2500.00, // TODO: Atualizar quando backend fornecer
+      faturamentoPrevisto: 2500.00, 
       diasPercorridos: currentDay,
       ticketMedio: this.totalPedidos > 0 ? this.totalVendas / this.totalPedidos : 0
     };
   }
 
-  // === CONTAS E SALDOS ===
   loadAccounts() {
+    if (!this.user?.id) return;
+    
     this.isLoadingAccounts = true;
-    
-    const url = this.getApiUrl('/api/v1/accounts', '8999');
-    
+
+    const url = this.getApiUrl(`/api/v1/account/all?personId=${this.user.id}`, '8999');
+
     this.http.get<AccountData[]>(url).subscribe({
       next: (accounts) => {
         this.accounts = accounts || [];
-        this.loadAccountBalances();
         this.isLoadingAccounts = false;
       },
       error: (error) => {
         console.error('Erro ao carregar contas:', error);
+        this.accounts = [];
         this.isLoadingAccounts = false;
       }
     });
   }
 
-  private loadAccountBalances() {
-    this.isLoadingBalances = true;
-    
-    const balancePromises = this.accounts.map(account => {
-      const url = this.getApiUrl(`/api/v1/account?accountId=${account.id}`, '8999');
-      return this.http.get<{balance: number, currency: string}>(url).toPromise()
-        .then((data) => {
-          if (data) {
-            this.accountBalances.set(account.id, {
-              accountId: account.id,
-              balance: data.balance,
-              currency: data.currency
-            });
-          }
-        })
-        .catch((error) => {
-          console.error(`Erro ao carregar saldo da conta ${account.name}:`, error);
-        });
-    });
-    
-    Promise.all(balancePromises).then(() => {
-      this.isLoadingBalances = false;
-    });
-  }
-
-  // === MÉTODOS DE INTERFACE ===
   setActiveTab(tab: 'orders' | 'finances' | 'metrics') {
     this.activeTab = tab;
   }
@@ -307,22 +270,21 @@ export class ReportComponent implements OnInit {
   }
 
   getAccountBalance(accountId: string): number {
-    return this.accountBalances.get(accountId)?.balance || 0;
+    const account = this.accounts.find(acc => acc.id === accountId);
+    return account?.balance?.balanceNow || 0;
   }
 
   getTotalBalance(): number {
-    let total = 0;
-    this.accountBalances.forEach(balance => {
-      total += balance.balance;
-    });
-    return total;
+    return this.accounts.reduce((total, account) => {
+      return total + (account.balance?.balanceNow || 0);
+    }, 0);
   }
 
   formatPrice(price: number): string {
     if (isNaN(price) || price === null || price === undefined) {
       return '€0,00';
     }
-    
+
     return new Intl.NumberFormat('pt-PT', {
       style: 'currency',
       currency: 'EUR'
@@ -341,7 +303,7 @@ export class ReportComponent implements OnInit {
   }
 
   getPaymentTypeLabel(paymentType: string): string {
-    const labels: {[key: string]: string} = {
+    const labels: { [key: string]: string } = {
       'CASH': '💵 Dinheiro',
       'CARD': '💳 Cartão'
     };
@@ -353,15 +315,9 @@ export class ReportComponent implements OnInit {
   }
 
   getAccountIcon(provider: string): string {
-    const icons: {[key: string]: string} = {
-      'BPI': '🏦',
-      'CASH': '💵',
-      'BANK': '🏛️'
-    };
-    return icons[provider] || '💼';
+    return provider === 'CASH' ? '💵' : '🏦';
   }
 
-  // Métodos específicos para a nova estrutura de pedidos
   getProfessionalSummary(): ProfessionalInfo[] {
     return this.professionalInfos;
   }

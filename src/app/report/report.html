@@ -209,12 +209,12 @@
       <section class="accounts-section">
         <h2>🏦 Saldo por Conta</h2>
 
-        <div class="loading" *ngIf="isLoadingAccounts || isLoadingBalances">
+        <div class="loading" *ngIf="isLoadingAccounts">
           <div class="spinner"></div>
           <span>Carregando saldos...</span>
         </div>
 
-        <div class="accounts-grid" *ngIf="!isLoadingAccounts && !isLoadingBalances">
+        <div class="accounts-grid" *ngIf="!isLoadingAccounts">
           <div class="account-card" *ngFor="let account of accounts">
             <div class="account-header">
               <span class="account-icon">{{ getAccountIcon(account.provider) }}</span>
