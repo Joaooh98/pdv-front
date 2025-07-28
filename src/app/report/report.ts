@@ -104,7 +104,7 @@ interface DashboardMetrics {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './report.html',
-  styleUrl: './report.scss'
+  styleUrls: ['./report.scss']
 })
 
 export class ReportComponent implements OnInit {

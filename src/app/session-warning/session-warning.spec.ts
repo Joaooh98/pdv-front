@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SessionWarning } from './session-warning';
+import { SessionWarningComponent } from './session-warning';
 
-describe('SessionWarning', () => {
-  let component: SessionWarning;
-  let fixture: ComponentFixture<SessionWarning>;
+describe('SessionWarningComponent', () => {
+  let component: SessionWarningComponent;
+  let fixture: ComponentFixture<SessionWarningComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SessionWarning]
+      imports: [SessionWarningComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SessionWarning);
+    fixture = TestBed.createComponent(SessionWarningComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

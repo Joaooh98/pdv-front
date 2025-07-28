@@ -17,7 +17,7 @@ interface UserData {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrls: ['./login.scss']
 })
 export class LoginComponent implements OnInit {
   usuario: string = '';
