@@ -68,7 +68,7 @@ interface OrderRequest {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './order.html',
-  styleUrl: './order.scss'
+  styleUrls: ['./order.scss']
 })
 export class OrderComponent implements OnInit {
   user: UserData | null = null;

@@ -8,7 +8,7 @@ import { AuthService } from '../auth.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './session-warning.html',
-  styleUrl: './session-warning.scss'
+  styleUrls: ['./session-warning.scss']
 })
 export class SessionWarningComponent implements OnInit, OnDestroy {
   showWarning = false;

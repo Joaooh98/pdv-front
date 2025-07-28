@@ -37,7 +37,7 @@ interface DashboardCard {
   standalone: true,
   imports: [CommonModule, SessionWarningComponent], // Adiciona o SessionWarningComponent
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss'
+  styleUrls: ['./dashboard.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   user: UserData | null = null;
