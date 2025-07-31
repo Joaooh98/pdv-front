@@ -42,11 +42,7 @@ export class LoginComponent implements OnInit {
       'http://147.79.101.18:3636/professional/token' :
       'http://localhost:3636/professional/token';
   }
-
-  // private getApiUrl(): string {
-  //   return 'http://147.79.101.18:3636/professional/token';
-  // }
-
+  
   onSubmit() {
     if (!this.usuario.trim() || !this.senha.trim()) {
       this.errorMessage = 'Usuário e senha são obrigatórios';
