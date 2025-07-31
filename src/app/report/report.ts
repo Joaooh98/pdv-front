@@ -51,8 +51,8 @@ interface OrderData {
     email: string;
     id: string;
     name: string;
-    password: string;
     username: string;
+    commission: number;
   };
   provider: string;
 }
@@ -73,9 +73,9 @@ interface OrdersResponse {
   totalAmount: number;
   totalAmountCard: number;
   totalAmountCash: number;
-  totalAmountDiscont: number;
   totalAmountFee: number;
   totalOrders: number;
+  totalComission: number;
 }
 
 interface AccountData {
@@ -115,7 +115,7 @@ export class ReportComponent implements OnInit {
 
   ordersResponse: OrdersResponse | null = null;
   orders: OrderData[] = [];
-  professionalInfos: ProfessionalInfo[] = []; 
+  professionalInfos: ProfessionalInfo[] = [];
   isLoadingOrders: boolean = false;
 
   accounts: AccountData[] = [];
@@ -144,12 +144,11 @@ export class ReportComponent implements OnInit {
     return this.ordersResponse?.totalAmountCard || 0;
   }
 
-  get totalDesconto(): number {
-    return this.ordersResponse?.totalAmountDiscont || 0;
-  }
-
   get totalAmountFee(): number {
     return this.ordersResponse?.totalAmountFee || 0;
+  }
+  get totalComission(): number {
+    return this.ordersResponse?.totalComission || 0;
   }
 
   activeTab: 'orders' | 'finances' | 'metrics' = 'orders';
@@ -198,6 +197,11 @@ export class ReportComponent implements OnInit {
     return `${base}${endpoint}`;
   }
 
+  // private getApiUrl(endpoint: string, port: string = '3636'): string {
+  //   const base = `http://147.79.101.18:${port}`;
+  //   return `${base}${endpoint}`;
+  // }
+
   loadOrders() {
     if (!this.user?.id) return;
 
@@ -208,8 +212,8 @@ export class ReportComponent implements OnInit {
     this.http.get<OrdersResponse>(url).subscribe({
       next: (response) => {
         this.ordersResponse = response;
-        this.orders = response.orders || []; 
-        this.professionalInfos = response.infos || []; 
+        this.orders = response.orders || [];
+        this.professionalInfos = response.infos || [];
         this.updateMetricsFromOrders();
         this.isLoadingOrders = false;
       },
@@ -231,7 +235,7 @@ export class ReportComponent implements OnInit {
     const currentDay = today.getDate();
     this.metrics = {
       valorEntradaDiaria: this.totalVendas,
-      faturamentoPrevisto: 2500.00, 
+      faturamentoPrevisto: 2500.00,
       diasPercorridos: currentDay,
       ticketMedio: this.totalPedidos > 0 ? this.totalVendas / this.totalPedidos : 0
     };
@@ -239,7 +243,7 @@ export class ReportComponent implements OnInit {
 
   loadAccounts() {
     if (!this.user?.id) return;
-    
+
     this.isLoadingAccounts = true;
 
     const url = this.getApiUrl(`/api/v1/account/all?personId=${this.user.id}`, '8999');
@@ -275,9 +279,11 @@ export class ReportComponent implements OnInit {
   }
 
   getTotalBalance(): number {
-    return this.accounts.reduce((total, account) => {
-      return total + (account.balance?.balanceNow || 0);
-    }, 0);
+    return this.accounts
+      .filter(account => account.name.toUpperCase().includes('SOCIOS'))
+      .reduce((total, account) => {
+        return total + (account.balance?.balanceNow || 0);
+      }, 0);
   }
 
   formatPrice(price: number): string {
@@ -325,4 +331,15 @@ export class ReportComponent implements OnInit {
   getTotalCommissions(): number {
     return this.professionalInfos.reduce((sum, info) => sum + info.amountComission, 0);
   }
+
+  getItemCommission(item: any, professional: any): number {
+    const productType = item?.product?.type?.toLowerCase();
+
+    if (productType === 'service') {
+      return professional?.commission || 0;
+    }
+
+    return item?.product?.commission || 0;
+  }
+
 }

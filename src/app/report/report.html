@@ -86,11 +86,18 @@
               <p class="card-value">{{ formatPrice(totalAmountFee) }}</p>
             </div>
           </div>
+
+          <div class="summary-card fee">
+            <div class="card-icon">🧾</div>
+            <div class="card-info">
+              <h3>Comissão dos barbeiros</h3>
+              <p class="card-value">{{ formatPrice(totalComission) }}</p>
+            </div>
+          </div>
         </div>
       </section>
 
       <!-- Resumo por Profissional (Admin) -->
-      <!-- Seção com problema corrigida -->
       <section class="professionals-section" *ngIf="user?.isAdmin && professionalInfos && professionalInfos.length > 1">
         <h2>Resumo por Profissional</h2>
         <div class="professionals-grid">
@@ -160,8 +167,8 @@
                   <span class="item-name">{{ item.product.description }}</span>
                   <span class="item-qty">Qtd: {{ item.product.quantity }}</span>
                   <span class="item-price">{{ formatPrice(item.product.amountSale) }}</span>
-                  <span class="item-commission" *ngIf="item.product.commission > 0">
-                    ({{ item.product.commission }}% comissão)
+                  <span class="item-commission" *ngIf="getItemCommission(item, order.professional) > 0">
+                    ({{ getItemCommission(item, order.professional) }}% comissão)
                   </span>
                 </div>
               </div>
@@ -195,7 +202,7 @@
 
       <!-- Saldo Total -->
       <section class="balance-summary">
-        <h2>💼 Saldo Total</h2>
+        <h2>💼 Saldo Total dos Sócios</h2>
         <div class="total-balance-card">
           <div class="balance-icon">💰</div>
           <div class="balance-info">

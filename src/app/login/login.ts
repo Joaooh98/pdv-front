@@ -24,25 +24,28 @@ export class LoginComponent implements OnInit {
   senha: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
-  
+
   constructor(
     private router: Router,
     private http: HttpClient,
     private authService: AuthService // Injeta o AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
-    // Se já está logado e sessão é válida, redireciona
     if (this.authService.isLoggedIn && this.authService.isSessionValid()) {
       this.router.navigate(['/dashboard']);
     }
   }
 
   private getApiUrl(): string {
-    return window.location.hostname !== 'localhost' ? 
-      'http://147.79.101.18:3636/professional/token' : 
+    return window.location.hostname !== 'localhost' ?
+      'http://147.79.101.18:3636/professional/token' :
       'http://localhost:3636/professional/token';
   }
+
+  // private getApiUrl(): string {
+  //   return 'http://147.79.101.18:3636/professional/token';
+  // }
 
   onSubmit() {
     if (!this.usuario.trim() || !this.senha.trim()) {
@@ -53,9 +56,8 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Codifica as credenciais em base64
     const credentials = btoa(`{"usuario":"${this.usuario}","senha":"${this.senha}"}`);
-    
+
     const body = {
       data: credentials
     };
@@ -63,18 +65,11 @@ export class LoginComponent implements OnInit {
     this.http.post<UserData>(this.getApiUrl(), body).subscribe({
       next: (response) => {
         console.log('Resposta da API:', response);
-        
-        // A API retorna diretamente os dados do usuário
+
         if (response && response.id && response.name) {
           console.log('Login bem-sucedido:', response);
-          
-          // USA O AUTHSERVICE em vez do localStorage diretamente
+
           this.authService.login(response);
-          
-          // Exibe mensagem de sucesso com informações da sessão
-          alert(`✅ Login realizado com sucesso!\n\n👤 Usuário: ${response.name}\n⏰ Sessão: 1 minuto de inatividade\n\nVocê será deslogado automaticamente após 1 minuto sem atividade.`);
-          
-          // Redireciona para o dashboard
           this.router.navigate(['/dashboard']);
         } else {
           console.error('Resposta inválida:', response);
@@ -84,8 +79,8 @@ export class LoginComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro HTTP:', error);
-        this.errorMessage = error.status === 401 ? 
-          'Usuário ou senha inválidos' : 
+        this.errorMessage = error.status === 401 ?
+          'Usuário ou senha inválidos' :
           'Erro de conexão com o servidor';
         this.isLoading = false;
       }
