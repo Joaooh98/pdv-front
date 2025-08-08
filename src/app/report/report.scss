@@ -869,3 +869,527 @@ section {
     }
   }
 }
+
+@media (max-width: 400px) {
+  
+  .report-header {
+    padding: 16px 12px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+
+    .back-btn {
+      padding: 8px 12px;
+      font-size: 14px;
+      align-self: flex-start;
+    }
+
+    h1 {
+      font-size: 20px;
+      align-self: center;
+    }
+
+    .header-info {
+      font-size: 12px;
+      align-self: center;
+    }
+  }
+
+  .report-tabs {
+    padding: 0 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 14px;
+      min-width: 100px;
+      flex-shrink: 0;
+    }
+  }
+  .report-content {
+    padding: 12px 8px;
+  }
+
+  .filters-section,
+  .summary-section,
+  .professionals-section,
+  .balance-summary,
+  .accounts-section,
+  .metrics-section,
+  .performance-section,
+  .orders-section {
+    padding: 16px 12px;
+    margin-bottom: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 16px 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+
+    .card-icon {
+      font-size: 24px;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+    }
+
+    .card-info {
+      flex: 1;
+      
+      h3 {
+        font-size: 12px;
+      }
+
+      .card-value {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .total-balance-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+
+    .balance-icon {
+      font-size: 36px;
+    }
+
+    .balance-info {
+      .total-amount {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .accounts-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .account-card {
+    padding: 16px 12px;
+
+    .account-header {
+      .account-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+
+      .account-info {
+        h3 {
+          font-size: 14px;
+        }
+
+        .account-provider {
+          font-size: 10px;
+        }
+      }
+    }
+
+    .account-balance {
+      .balance-amount {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .metric-card {
+    padding: 16px 12px;
+
+    .metric-header {
+      .metric-icon {
+        font-size: 20px;
+      }
+
+      h3 {
+        font-size: 12px;
+      }
+    }
+
+    .metric-value {
+      font-size: 24px;
+    }
+
+    .metric-subtitle {
+      font-size: 11px;
+    }
+  }
+
+  .performance-cards {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .performance-card {
+    padding: 16px 12px;
+
+    h3 {
+      font-size: 14px;
+    }
+
+    .payment-distribution {
+      .payment-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+
+        .payment-label {
+          font-size: 12px;
+        }
+
+        .payment-value {
+          font-size: 14px;
+        }
+
+        .payment-percent {
+          font-size: 11px;
+          margin-left: 0;
+        }
+      }
+    }
+  }
+
+  .professionals-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .professional-card {
+    padding: 16px 12px;
+
+    .professional-header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+
+      h3 {
+        font-size: 14px;
+        flex: 1;
+      }
+
+      .professional-total {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+    }
+
+    .professional-details {
+      .detail-item {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+
+        .label {
+          font-size: 12px;
+          flex: 1;
+        }
+
+        .value {
+          font-size: 14px;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+
+  .orders-list {
+    gap: 12px;
+  }
+
+  .order-card {
+    padding: 16px 12px;
+
+    .order-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .order-info {
+        width: 100%;
+
+        h3 {
+          font-size: 14px;
+        }
+
+        .order-date {
+          font-size: 11px;
+        }
+
+        .order-provider {
+          font-size: 10px;
+          display: block;
+          margin-top: 4px;
+        }
+      }
+
+      .order-total {
+        width: 100%;
+        // Manter alinhamento à direita
+        align-items: flex-end;
+        text-align: right;
+        align-self: flex-end;
+
+        .amount {
+          font-size: 16px;
+        }
+
+        .payment-type {
+          font-size: 12px;
+        }
+
+        .finance-badge {
+          font-size: 10px;
+        }
+      }
+    }
+
+    .order-professional {
+      padding: 10px;
+      
+      .professional-name {
+        font-size: 13px;
+      }
+
+      .professional-username {
+        font-size: 11px;
+        display: block;
+        margin-top: 2px;
+        margin-right: 0;
+      }
+
+      .admin-badge {
+        font-size: 9px;
+        margin-top: 4px;
+        display: inline-block;
+      }
+    }
+
+    .order-items {
+      h4 {
+        font-size: 13px;
+      }
+
+      .item-list {
+        .item {
+          // Manter layout horizontal compacto com preço à direita
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          padding: 10px;
+
+          .item-name {
+            font-size: 13px;
+            flex: 1;
+            min-width: 120px;
+          }
+
+          .item-qty {
+            font-size: 11px;
+            order: 3;
+          }
+
+          .item-price {
+            font-size: 12px;
+            font-weight: 700;
+            order: 2;
+            margin-left: auto;
+          }
+
+          .item-commission {
+            font-size: 10px;
+            order: 4;
+            width: 100%;
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+
+    .order-fees {
+      h4 {
+        font-size: 13px;
+      }
+
+      .fee-list {
+        flex-direction: column;
+        gap: 6px;
+
+        .fee-item {
+          font-size: 11px;
+          padding: 6px 8px;
+        }
+      }
+    }
+
+    .order-commission {
+      // Manter layout horizontal com valor à direita
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+
+      .commission-label {
+        font-size: 12px;
+        flex: 1;
+      }
+
+      .commission-value {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // === FILTROS ===
+  .filters-section {
+    .date-filters {
+      .form-group {
+        label {
+          font-size: 12px;
+        }
+
+        .form-control {
+          padding: 10px 12px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+
+  // === LOADING ===
+  .loading {
+    padding: 30px 20px;
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 12px;
+    }
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  // === NO ORDERS ===
+  .no-orders {
+    padding: 30px 20px;
+
+    span {
+      font-size: 18px;
+    }
+  }
+
+  // === SEÇÕES GERAIS ===
+  section {
+    h2 {
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+// === RESPONSIVIDADE PARA TELAS EXTRA PEQUENAS (< 320px) ===
+@media (max-width: 320px) {
+  
+  .report-header {
+    padding: 12px 8px;
+
+    h1 {
+      font-size: 18px;
+    }
+
+    .back-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+  }
+
+  .report-tabs {
+    padding: 0 4px;
+
+    .tab-btn {
+      padding: 10px 12px;
+      font-size: 12px;
+      min-width: 80px;
+    }
+  }
+
+  .report-content {
+    padding: 8px 4px;
+  }
+
+  .summary-card {
+    padding: 12px 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    .card-icon {
+      font-size: 20px;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+    }
+
+    .card-info {
+      flex: 1;
+      
+      .card-value {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .total-balance-card {
+    padding: 12px;
+
+    .balance-info {
+      .total-amount {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .metric-card {
+    .metric-value {
+      font-size: 20px;
+    }
+  }
+
+  .order-card {
+    padding: 12px 8px;
+
+    .order-header {
+      .order-total {
+        align-items: flex-end;
+        text-align: right;
+        
+        .amount {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

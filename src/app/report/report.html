@@ -150,7 +150,6 @@
                 <span class="amount">{{ formatPrice(order.amount) }}</span>
                 <span class="payment-type" *ngIf="order.payments && order.payments.length > 0">{{
                   getPaymentTypeIcon(order.payments[0].paymentType) }}</span>
-                <span class="finance-badge" *ngIf="order.finance">💼</span>
               </div>
             </div>
 
@@ -185,7 +184,7 @@
             </div>
 
             <div class="order-commission" *ngIf="order.amountCommission > 0">
-              <span class="commission-label">💼 Comissão:</span>
+              <span class="commission-label"> Comissão:</span>
               <span class="commission-value">{{ formatPrice(order.amountCommission) }}</span>
             </div>
           </div>
